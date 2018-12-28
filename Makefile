@@ -18,3 +18,12 @@ run-server:
 		source ./venv/bin/activate; \
 		python server/app.py runserver; \
 	)
+
+install-client:
+	yarn install
+
+run-client:
+	yarn run start
+
+build-client:
+	yarn run build
