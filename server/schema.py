@@ -29,12 +29,13 @@ class SignUp(graphene.Mutation):
         username = graphene.String(required=True)
         password = graphene.String(required=True)
     user = graphene.Field(lambda: UserObject)
+    auth_token = graphene.String()
     def mutate(self, info, username, password):
         user = User(username=username)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        return SignUp(user=user)
+        return SignUp(user=user, auth_token=user.encode_auth_token(user.uuid).decode())
 
 
 class Login(graphene.Mutation):
@@ -42,11 +43,12 @@ class Login(graphene.Mutation):
         username = graphene.String(required=True)
         password = graphene.String(required=True)
     user = graphene.Field(lambda: UserObject)
+    auth_token = graphene.String()
     def mutate(self, info, username, password):
         user = User.query.filter_by(username=username).first()
         if user is None or not user.check_password(password):
             raise GraphQLError("Invalid Credentials")
-        return Login(user=user)
+        return Login(user=user, auth_token=user.encode_auth_token(user.uuid).decode())
 
 
 class CreatePost(graphene.Mutation):

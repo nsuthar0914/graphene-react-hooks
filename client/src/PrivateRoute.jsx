@@ -4,7 +4,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { isAuthenticated } from "./utils";
+import { isAuthenticated } from "./utils.js";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route

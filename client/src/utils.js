@@ -3,11 +3,11 @@ export const isAuthenticated = () => {
   if (user) {
     user = JSON.parse(user);
   }
-  const token = localStorage.getItem("id_token");
-  return !!(user && user.is_superuser && token);
+  const token = localStorage.getItem("authToken");
+  return !!(user && token);
 };
 
 export const unAuthenticate = () => {
-  localStorage.removeItem("id_token");
+  localStorage.removeItem("authToken");
   localStorage.removeItem("user");
 };

@@ -17,7 +17,7 @@ import App from "./App.jsx";
 
 const history = createHistory();
 
-const httpLink = new HttpLink({ uri: "http://localhost:5000/graphql/" });
+const httpLink = new HttpLink({ uri: "http://localhost:5000/graphql" });
 
 const authErrorLink = onError(({ graphQLErrors }) => {
   const hasUnauthorized = graphQLErrors && graphQLErrors.find(error => {
@@ -37,7 +37,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
     // add the authorization to the headers
     operation.setContext({
       headers: {
-        Authorization: `JWT ${localStorage.getItem("id_token")}`,
+        Authorization: `JWT ${localStorage.getItem("authToken")}`,
       },
     });
   }
