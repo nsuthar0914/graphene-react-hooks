@@ -4,7 +4,7 @@ export const isAuthenticated = () => {
     user = JSON.parse(user);
   }
   const token = localStorage.getItem("authToken");
-  return !!(user && token);
+  return !!(user && token) ? user : false;
 };
 
 export const unAuthenticate = () => {

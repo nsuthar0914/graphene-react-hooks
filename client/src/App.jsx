@@ -10,13 +10,14 @@ import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import Button from '@material-ui/core/Button';
 
-import Post from "./Post.jsx";
 import Posts from "./Posts.jsx";
 import Login from "./Login.jsx";
 import Signup from "./Signup.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
-import { isAuthenticated } from "./utils";
+import { isAuthenticated, unAuthenticate } from "./utils";
+import { AuthContext } from "./auth-context";
 
 
 const styles = theme => {
@@ -40,31 +41,43 @@ const styles = theme => {
       minWidth: 0, // So the Typography noWrap works
     },
     toolbar: theme.mixins.toolbar,
+    grow: {
+      flexGrow: 1,
+    },
   });
 };
 
-const App = ({ classes, location }) => {
-  function activeRoute(routeName) {
-    return location.pathname.indexOf(routeName) > -1;
-  }
+const App = ({ classes, location, history }) => {
   return (
-    <div className={classes.root}>
-      <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="title" color="inherit" noWrap>
-            Blogging App
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      {location.pathname === "/" && <Redirect to="/posts" />}
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
-        <PrivateRoute path="/posts" component={Posts} />
-        <PrivateRoute path="/posts/:postid" component={Post} />
-      </main>
-    </div>
+    <AuthContext.Provider value={{ user: isAuthenticated() }}>
+      <div className={classes.root}>
+        <AppBar position="absolute" className={classes.appBar}>
+          <Toolbar>
+            <Typography variant="title" color="inherit" noWrap className={classes.grow}>
+              Blogging App
+            </Typography>
+            {isAuthenticated()
+              ? (<Button
+                color="inherit"
+                onClick={() => {
+                  unAuthenticate();
+                  history.push("/login");
+                }}
+              >
+                Logout
+              </Button>)
+              : <Button color="inherit" onClick={() => history.push("/login")}>Login</Button>}
+          </Toolbar>
+        </AppBar>
+        {location.pathname === "/" && <Redirect to="/posts" />}
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={Signup} />
+          <PrivateRoute path="/posts" component={Posts} />
+        </main>
+      </div>
+    </AuthContext.Provider>
   );
 };
 

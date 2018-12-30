@@ -21,8 +21,8 @@ const httpLink = new HttpLink({ uri: "http://localhost:5000/graphql" });
 
 const authErrorLink = onError(({ graphQLErrors }) => {
   const hasUnauthorized = graphQLErrors && graphQLErrors.find(error => {
-    const { statusCode } = error;
-    return statusCode === 401;
+    const { message } = error;
+    return message.includes("expired");
   });
   if (hasUnauthorized) {
     unAuthenticate();

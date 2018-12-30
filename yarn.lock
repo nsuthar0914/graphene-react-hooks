@@ -629,6 +629,13 @@
     recompose "^0.29.0"
     warning "^4.0.1"
 
+"@material-ui/icons@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-3.0.1.tgz#671fb3d04dcaf9351dbbd2bf82ae2ae72e3d93cd"
+  dependencies:
+    "@babel/runtime" "7.0.0"
+    recompose "^0.29.0"
+
 "@types/async@2.0.49":
   version "2.0.49"
   resolved "http://registry.npmjs.org/@types/async/-/async-2.0.49.tgz#92e33d13f74c895cb9a7f38ba97db8431ed14bc0"

@@ -30,6 +30,7 @@ const LOGIN_MUTATION = gql`
     login( username: $username, password: $password ) {
       user {
         username
+        uuid
       }
       authToken
     }

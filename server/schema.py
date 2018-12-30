@@ -42,10 +42,10 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     def resolve_viewer(root, info):
-        # auth_resp = User.decode_auth_token(info.context)
-        # if not isinstance(auth_resp, str):
-        return Viewer()
-        # raise GraphQLError(auth_resp)
+        auth_resp = User.decode_auth_token(info.context)
+        if not isinstance(auth_resp, str):
+            return Viewer()
+        raise GraphQLError(auth_resp)
 
 
 class SignUp(graphene.Mutation):
@@ -80,12 +80,12 @@ class CreatePost(graphene.Mutation):
     class Arguments:
         title = graphene.String(required=True)
         body = graphene.String(required=True) 
-        username = graphene.String(required=True)
+        author_uuid = graphene.Int(required=True)
     post = graphene.Field(lambda: PostObject)
     
     @require_auth
     def mutate(self, info, **kwargs):
-        user = User.query.filter_by(username=kwargs.get('username')).first()
+        user = User.query.filter_by(uuid=kwargs.get('author_uuid')).first()
         post = Post(title=kwargs.get('title'), body=kwargs.get('body'))
         if user is not None:
             post.author = user
