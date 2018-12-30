@@ -6,7 +6,7 @@ import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import SaveIcon from '@material-ui/icons/Save';
-import { useMutation, useApolloClient } from "react-apollo-hooks";
+import { useMutation } from "react-apollo-hooks";
 import { GET_POSTS } from "./Posts.jsx";
 
 const CREATE_POST_MUTATION = gql`
@@ -48,7 +48,6 @@ const styles = theme => ({
 const AddPost = ({ authorUuid, classes }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const client = useApolloClient();
   const submitPost = useMutation(CREATE_POST_MUTATION, {
     update: (proxy, { data: { createPost } }) => {
       const data = proxy.readQuery({
@@ -74,7 +73,6 @@ const AddPost = ({ authorUuid, classes }) => {
         query: GET_POSTS,
         data: newData,
       });
-      client.queryManager.broadcastQueries();
     },
     variables: {
       title: title,
@@ -84,6 +82,7 @@ const AddPost = ({ authorUuid, classes }) => {
   });
   return (
     <div className={classes.wrapper}>
+      <h1>Add Post</h1>
       <div className={classes.controls}>
         <IconButton className={classes.button} aria-label="Save" onClick={submitPost}>
           <SaveIcon />
