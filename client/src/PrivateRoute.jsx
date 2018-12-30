@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import PropTypes from "prop-types";
 import {
   Route,
@@ -11,7 +11,9 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
     {...rest}
     render={props => {
       return (isAuthenticated() ? (
-        <Component {...props} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Component {...props} />
+        </Suspense>
       ) : (
         <Redirect
           to={{

@@ -5,6 +5,16 @@ from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from db import db
 
 
+def require_auth(method):
+    def wrapper(self, *args, **kwargs):
+        auth_resp = User.decode_auth_token(args[0].context)
+        if not isinstance(auth_resp, str):
+            kwargs['user'] = User.query.filter_by(uuid=auth_resp).first()
+            return method(self, *args, **kwargs)
+        raise GraphQLError(auth_resp)
+    return wrapper
+
+
 class PostObject(SQLAlchemyObjectType):
     class Meta:
         model = Post
@@ -18,10 +28,24 @@ class UserObject(SQLAlchemyObjectType):
        exclude_fields = ('password_hash')
 
 
-class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
+class Viewer(graphene.ObjectType):
+    class Meta:
+        interfaces = (graphene.relay.Node, )
+
     all_posts = SQLAlchemyConnectionField(PostObject)
     all_users = SQLAlchemyConnectionField(UserObject)
+
+
+class Query(graphene.ObjectType):
+    node = graphene.relay.Node.Field()
+    viewer = graphene.Field(Viewer)
+
+    @staticmethod
+    def resolve_viewer(root, info):
+        # auth_resp = User.decode_auth_token(info.context)
+        # if not isinstance(auth_resp, str):
+        return Viewer()
+        # raise GraphQLError(auth_resp)
 
 
 class SignUp(graphene.Mutation):
@@ -30,9 +54,9 @@ class SignUp(graphene.Mutation):
         password = graphene.String(required=True)
     user = graphene.Field(lambda: UserObject)
     auth_token = graphene.String()
-    def mutate(self, info, username, password):
-        user = User(username=username)
-        user.set_password(password)
+    def mutate(self, info, **kwargs):
+        user = User(username=kwargs.get('username'))
+        user.set_password(kwargs.get('password'))
         db.session.add(user)
         db.session.commit()
         return SignUp(user=user, auth_token=user.encode_auth_token(user.uuid).decode())
@@ -44,9 +68,10 @@ class Login(graphene.Mutation):
         password = graphene.String(required=True)
     user = graphene.Field(lambda: UserObject)
     auth_token = graphene.String()
-    def mutate(self, info, username, password):
-        user = User.query.filter_by(username=username).first()
-        if user is None or not user.check_password(password):
+
+    def mutate(self, info, **kwargs):
+        user = User.query.filter_by(username=kwargs.get('username')).first()
+        if user is None or not user.check_password(kwargs.get('password')):
             raise GraphQLError("Invalid Credentials")
         return Login(user=user, auth_token=user.encode_auth_token(user.uuid).decode())
 
@@ -57,9 +82,11 @@ class CreatePost(graphene.Mutation):
         body = graphene.String(required=True) 
         username = graphene.String(required=True)
     post = graphene.Field(lambda: PostObject)
-    def mutate(self, info, title, body, username):
-        user = User.query.filter_by(username=username).first()
-        post = Post(title=title, body=body)
+    
+    @require_auth
+    def mutate(self, info, **kwargs):
+        user = User.query.filter_by(username=kwargs.get('username')).first()
+        post = Post(title=kwargs.get('title'), body=kwargs.get('body'))
         if user is not None:
             post.author = user
         db.session.add(post)
