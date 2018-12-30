@@ -73,6 +73,8 @@ const AddPost = ({ authorUuid, classes }) => {
         query: GET_POSTS,
         data: newData,
       });
+      setTitle("");
+      setBody("");
     },
     variables: {
       title: title,

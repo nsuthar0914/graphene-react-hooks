@@ -54,7 +54,7 @@ const App = ({ classes, location, history }) => {
         <AppBar position="absolute" className={classes.appBar}>
           <Toolbar>
             <Typography variant="title" color="inherit" noWrap className={classes.grow}>
-              Blogging App
+              {location.pathname}
             </Typography>
             {isAuthenticated()
               ? (<Button
@@ -66,15 +66,18 @@ const App = ({ classes, location, history }) => {
               >
                 Logout
               </Button>)
-              : <Button color="inherit" onClick={() => history.push("/login")}>Login</Button>}
+              : <>
+                <Button color="inherit" onClick={() => history.push("/signup")}>Signup</Button>
+                <Button color="inherit" onClick={() => history.push("/login")}>Login</Button>
+              </>}
           </Toolbar>
         </AppBar>
         {location.pathname === "/" && <Redirect to="/posts" />}
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={Signup} />
-          <PrivateRoute path="/posts" component={Posts} />
+          <Route name="Login" path="/login" component={Login} />
+          <Route name="Signup" path="/signup" component={Signup} />
+          <PrivateRoute name="Posts" path="/posts" component={Posts} />
         </main>
       </div>
     </AuthContext.Provider>

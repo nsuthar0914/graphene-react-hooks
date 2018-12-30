@@ -47,7 +47,9 @@ const Login  = (props) => {
       if (data && data.login && data.login.user) {
         localStorage.setItem("user", JSON.stringify(data.login.user));
         localStorage.setItem("authToken", data.login.authToken);
-        history.push(from.pathname);
+        setTimeout(() => {
+          history.push(from.pathname);
+        }, 0);
       }
     },
     variables: {
